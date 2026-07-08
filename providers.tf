@@ -11,15 +11,14 @@ terraform {
   }
 
   required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = ">= 5.26.0, < 8"
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "4.1.0"
     }
   }
 }
 
-provider "google" {
-  project = var.project_id
-  region  = "us-east4"
+provider "azurerm" {
+  features {}
 }
 
