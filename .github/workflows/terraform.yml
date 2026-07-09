@@ -15,11 +15,11 @@ on:
       workspace:
         description: "Select the target Azure Workspace"
         required: true
-        default: "azure-dev"
+        default: "az-candle-store-dev"
         type: choice
         options:
-          - azure-dev
-          - azure-prod
+          - az-candle-store-dev
+          - az-candle-store-prod
 
 jobs:
   terraform:
