@@ -12,22 +12,23 @@ on:
           - plan
           - apply
           - destroy
-      workspace:
-        description: "Select the target Azure Workspace"
+      environment:
+        description: "Select the target environment"
         required: true
-        default: "az-candle-store-dev"
+        default: "dev"
         type: choice
         options:
-          - az-candle-store-dev
-          - az-candle-store-prod
+          - dev
+          - prod
 
 jobs:
   terraform:
-    name: "Azure TF ${{ github.event.inputs.action }} (${{ github.event.inputs.workspace }})"
+    name: "Azure TF ${{ github.event.inputs.action }} (${{ github.event.inputs.environment }})"
     runs-on: ubuntu-latest
 
     env:
-      TF_WORKSPACE: ${{ github.event.inputs.workspace }}
+      # Dynamically map 'dev' to 'az-candle-store-dev' for TFC mapping
+      TF_WORKSPACE: "az-candle-store-${{ github.event.inputs.environment }}"
 
     steps:
       - name: Checkout Code
@@ -44,12 +45,12 @@ jobs:
 
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan'
-        run: terraform plan -input=false
+        run: terraform plan -var-file="environments/${{ github.event.inputs.environment }}.tfvars" -input=false
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -var-file="environments/${{ github.event.inputs.environment }}.tfvars" -auto-approve -input=false
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
-        run: terraform destroy -auto-approve -input=false
+        run: terraform destroy -var-file="environments/${{ github.event.inputs.environment }}.tfvars" -auto-approve -input=false
