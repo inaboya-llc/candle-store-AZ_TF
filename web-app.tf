@@ -8,7 +8,7 @@ resource "azurerm_container_registry" "acr" {
 }
 
 # 3. Create the App Service Plan
-resource "azurerm_service_plan" "example" {
+resource "azurerm_service_plan" "sp" {
   name                = "candle-store-sp"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -21,7 +21,7 @@ resource "azurerm_linux_web_app" "webApp" {
   name                = "samuel-candle-store-app"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.example.id
+  service_plan_id     = azurerm_service_plan.sp.id
 
   app_settings = {
     "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
