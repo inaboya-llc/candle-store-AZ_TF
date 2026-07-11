@@ -9,7 +9,7 @@ resource "azurerm_container_registry" "acr" {
 
 # 3. Create the App Service Plan
 resource "azurerm_service_plan" "sp" {
-  name                = "candle-store-sp"
+  name                = "candle-store-sp-dev"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   os_type             = "Linux"
