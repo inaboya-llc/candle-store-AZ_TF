@@ -17,7 +17,7 @@ resource "azurerm_service_plan" "example" {
 }
 
 # 4. Deploy the Linux Web App
-resource "azurerm_linux_web_app" "example" {
+resource "azurerm_linux_web_app" "webApp" {
   name                = "samuel-candle-store-app"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -49,5 +49,5 @@ resource "azurerm_linux_web_app" "example" {
 resource "azurerm_role_assignment" "acr_pull" {
   scope                = azurerm_container_registry.acr.id
   role_definition_name = "AcrPull"
-  principal_id         = azurerm_linux_web_app.rg.identity[0].principal_id
+  principal_id         = azurerm_linux_web_app.webApp.identity[0].principal_id
 }
