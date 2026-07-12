@@ -1,5 +1,7 @@
 name: "Terraform Azure Automation"
 
+name: "Terraform Azure Automation"
+
 on:
   workflow_dispatch:
     inputs:
@@ -20,15 +22,22 @@ on:
         options:
           - dev
           - prod
+  
+  # 👈 Add this block to catch the handshake from the app repo
+  repository_dispatch:
+    types: [deploy-triggered-by-app]
 
 jobs:
   terraform:
-    name: "Azure TF ${{ github.event.inputs.action }} (${{ github.event.inputs.environment }})"
+    # Fallback to 'apply' and 'dev' if triggered via repository dispatch
+    name: "Azure TF ${{ github.event.inputs.action || 'apply' }} (${{ github.event.inputs.environment || 'dev' }})"
     runs-on: ubuntu-latest
-
+    
     env:
-      # Dynamically map 'dev' to 'az-candle-store-dev' for TFC mapping
-      TF_WORKSPACE: "az-candle-store-${{ github.event.inputs.environment }}"
+      # Dynamically map environment or default to dev
+      TF_WORKSPACE: "az-candle-store-${{ github.event.inputs.environment || 'dev' }}"
+      # 👈 Catch the incoming image tag from the app repo payload
+      TF_VAR_web_app_image_tag: ${{ github.event.client_payload.image_tag || 'latest' }}
 
     steps:
       - name: Checkout Code
@@ -43,13 +52,17 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      # Update plans to run on manual trigger OR if explicitly requested
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan'
         run: terraform plan -var-file="environments/${{ github.event.inputs.environment }}.tfvars" -input=false
 
+      # Adjust Apply to run on manual 'apply' OR via the repository dispatch handshake
       - name: Terraform Apply
-        if: github.event.inputs.action == 'apply'
-        run: terraform apply -var-file="environments/${{ github.event.inputs.environment }}.tfvars" -auto-approve -input=false
+        if: github.event.inputs.action == 'apply' || github.event_name == 'repository_dispatch'
+        run: |
+          ENV_NAME="${{ github.event.inputs.environment || 'dev' }}"
+          terraform apply -var-file="environments/$ENV_NAME.tfvars" -var="image_tag=${{ env.TF_VAR_web_app_image_tag }}" -auto-approve -input=false
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
