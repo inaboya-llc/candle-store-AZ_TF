@@ -8,3 +8,9 @@ variable "location" {
   type        = string
   default     = "centralus"
 }
+
+variable "web_app_image_tag" {
+  description = "The Docker image tag for the Linux Web App"
+  type        = string
+  default     = "latest"
+}
