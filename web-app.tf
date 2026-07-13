@@ -41,7 +41,7 @@ resource "azurerm_linux_web_app" "webApp" {
     container_registry_use_managed_identity = true
 
     application_stack {
-      docker_image_name   = "candle-store-app:${var.web_app_image_tag}"
+      docker_image_name   = "candle-store-app:${var.image_tag}"
       # Dynamically grab the login server from the new ACR resource block above
       docker_registry_url = "https://${azurerm_container_registry.acr.login_server}"
     }
