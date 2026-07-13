@@ -14,3 +14,8 @@ variable "image_tag" {
   type        = string
   default     = "latest"
 }
+
+variable "github_sp_object_id" {
+  description = "The Object ID of the Service Principal used by GitHub Actions"
+  type        = string
+}
