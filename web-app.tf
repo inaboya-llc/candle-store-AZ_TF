@@ -54,3 +54,9 @@ resource "azurerm_role_assignment" "acr_pull" {
   role_definition_name = "AcrPull"
   principal_id         = azurerm_linux_web_app.webApp.identity[0].principal_id
 }
+
+resource "azurerm_role_assignment" "github_acr_push" {
+  scope                = azurerm_container_registry.acr.id # Make sure '.acr.' matches your actual registry resource name
+  role_definition_name = "AcrPush"
+  principal_id         = var.github_sp_object_id
+}
