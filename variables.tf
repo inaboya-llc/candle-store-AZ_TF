@@ -19,3 +19,8 @@ variable "github_sp_object_id" {
   description = "The Object ID of the Service Principal used by GitHub Actions"
   type        = string
 }
+
+variable "acr_name" {
+  description = "The globally unique name for the Azure Container Registry"
+  type        = string
+}
