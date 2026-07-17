@@ -15,7 +15,8 @@ resource "azurerm_service_plan" "sp" {
   os_type             = "Linux"
   sku_name            = "S1"
   depends_on = [
-    azurerm_resource_group.rg
+    azurerm_resource_group.rg,
+    azurerm_container_registry.acr
   ]
 }
 
