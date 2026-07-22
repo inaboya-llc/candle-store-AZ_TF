@@ -1,63 +1,63 @@
-# 2. Automatically Create the Azure Container Registry
-resource "azurerm_container_registry" "acr" {
-  name                = var.acr_name # Must be globally unique and alphanumeric
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  sku                 = "Basic" # Basic is perfect for development and budget-friendly
-  admin_enabled       = false   # Disabled because we are using Managed Identity for security instead
-}
+# # 2. Automatically Create the Azure Container Registry
+# resource "azurerm_container_registry" "acr" {
+#   name                = var.acr_name # Must be globally unique and alphanumeric
+#   resource_group_name = azurerm_resource_group.rg.name
+#   location            = azurerm_resource_group.rg.location
+#   sku                 = "Basic" # Basic is perfect for development and budget-friendly
+#   admin_enabled       = false   # Disabled because we are using Managed Identity for security instead
+# }
 
-# 3. Create the App Service Plan
-resource "azurerm_service_plan" "sp" {
-  name                = "candle-store-sp-dev"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  os_type             = "Linux"
-  sku_name            = "S1"
-  depends_on = [
-    azurerm_resource_group.rg,
-    azurerm_container_registry.acr
-  ]
-}
+# # 3. Create the App Service Plan
+# resource "azurerm_service_plan" "sp" {
+#   name                = "candle-store-sp-dev"
+#   location            = azurerm_resource_group.rg.location
+#   resource_group_name = azurerm_resource_group.rg.name
+#   os_type             = "Linux"
+#   sku_name            = "S1"
+#   depends_on = [
+#     azurerm_resource_group.rg,
+#     azurerm_container_registry.acr
+#   ]
+# }
 
-# 4. Deploy the Linux Web App
-resource "azurerm_linux_web_app" "webApp" {
-  name                = "samuel-candle-store-app"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.sp.id
+# # 4. Deploy the Linux Web App
+# resource "azurerm_linux_web_app" "webApp" {
+#   name                = "samuel-candle-store-app"
+#   location            = azurerm_resource_group.rg.location
+#   resource_group_name = azurerm_resource_group.rg.name
+#   service_plan_id     = azurerm_service_plan.sp.id
 
-  app_settings = {
-    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-  }
+#   app_settings = {
+#     "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
+#   }
 
-  identity {
-    type = "SystemAssigned"
-  }
+#   identity {
+#     type = "SystemAssigned"
+#   }
 
-  site_config {
-    always_on = true
+#   site_config {
+#     always_on = true
 
-    # Tell App Service to authenticate using its Managed Identity
-    container_registry_use_managed_identity = true
+#     # Tell App Service to authenticate using its Managed Identity
+#     container_registry_use_managed_identity = true
 
-    application_stack {
-      docker_image_name   = "candle-store-app:${var.image_tag}"
-      # Dynamically grab the login server from the new ACR resource block above
-      docker_registry_url = "https://${azurerm_container_registry.acr.login_server}"
-    }
-  }
-}
+#     application_stack {
+#       docker_image_name   = "candle-store-app:${var.image_tag}"
+#       # Dynamically grab the login server from the new ACR resource block above
+#       docker_registry_url = "https://${azurerm_container_registry.acr.login_server}"
+#     }
+#   }
+# }
 
-# 5. Dynamic Role Assignment using the created registry's ID
-resource "azurerm_role_assignment" "acr_pull" {
-  scope                = azurerm_container_registry.acr.id
-  role_definition_name = "AcrPull"
-  principal_id         = azurerm_linux_web_app.webApp.identity[0].principal_id
-}
+# # 5. Dynamic Role Assignment using the created registry's ID
+# resource "azurerm_role_assignment" "acr_pull" {
+#   scope                = azurerm_container_registry.acr.id
+#   role_definition_name = "AcrPull"
+#   principal_id         = azurerm_linux_web_app.webApp.identity[0].principal_id
+# }
 
-resource "azurerm_role_assignment" "github_acr_push" {
-  scope                = azurerm_container_registry.acr.id # Make sure '.acr.' matches your actual registry resource name
-  role_definition_name = "AcrPush"
-  principal_id         = var.github_sp_object_id
-}
+# resource "azurerm_role_assignment" "github_acr_push" {
+#   scope                = azurerm_container_registry.acr.id # Make sure '.acr.' matches your actual registry resource name
+#   role_definition_name = "AcrPush"
+#   principal_id         = var.github_sp_object_id
+# }
