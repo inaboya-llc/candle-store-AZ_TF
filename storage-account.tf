@@ -1,8 +1,8 @@
 # Create an Azure Storage Account
 resource "azurerm_storage_account" "candlestore_sa" {
   name                     = "candlestoresa01" # Must be globally unique, 3-24 lowercase letters/numbers
-  resource_group_name      = azurerm_resource_group.main.name
-  location                 = azurerm_resource_group.main.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS" # Options: LRS, GRS, RAGRS, ZRS
 
