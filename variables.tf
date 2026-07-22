@@ -9,11 +9,11 @@ variable "location" {
   default     = "centralus"
 }
 
-# variable "image_tag" {
-#   description = "The Docker image tag for the Linux Web App"
-#   type        = string
-#   default     = "latest"
-# }
+variable "image_tag" {
+  description = "The Docker image tag for the Linux Web App"
+  type        = string
+  default     = "latest"
+}
 
 # variable "github_sp_object_id" {
 #   description = "The Object ID of the Service Principal used by GitHub Actions"
